@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>⚽ Virtual Football League</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: white;
+      background:
+        radial-gradient(circle at top right, #244b70, transparent 35%),
+        radial-gradient(circle at bottom left, #183f35, transparent 35%),
+        #071019;
+      padding: 15px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    /* Header */
+
+    .header {
+      padding: 22px;
+      margin-bottom: 15px;
+      text-align: center;
+      border-radius: 25px;
+
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.18);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: #b9c6d3;
+      font-size: 13px;
+    }
+
+    /* League */
+
+    .league-select {
+      width: 100%;
+      margin-top: 18px;
+      padding: 13px;
+
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,0.18);
+
+      background: rgba(255,255,255,0.08);
+      color: white;
+
+      outline: none;
+      font-size: 14px;
+    }
+
+    .league-select option {
+      color: black;
+    }
+
+    /* Main menu */
+
+    .menu {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+
+      padding: 15px;
+
+      border-radius: 25px;
+
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .menu-button {
+      min-height: 115px;
+
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+
+      background: rgba(255,255,255,0.07);
+      color: white;
+
+      font-size: 16px;
+
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .menu-button:active {
+      transform: scale(0.95);
+      background: rgba(255,255,255,0.16);
+    }
+
+    .menu-icon {
+      display: block;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    /* Pages */
+
+    .page {
+      display: none;
+
+      margin-top: 15px;
+      padding: 20px;
+
+      border-radius: 25px;
+
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.16);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .back {
+      border: none;
+      padding: 9px 15px;
+
+      border-radius: 12px;
+
+      background: rgba(255,255,255,0.1);
+      color: white;
+
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+
+    .page h2 {
+      margin-bottom: 15px;
+    }
+
+    /* Table */
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 10px 4px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    th {
+      color: #9fb0c0;
+    }
+
+    /* Results */
+
+    .week-buttons {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin-bottom: 15px;
+    }
+
+    .week-button {
+      white-space: nowrap;
+
+      padding: 9px 14px;
+
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    .match {
+      padding: 15px;
+      margin-bottom: 10px;
+
+      text-align: center;
+
+      border-radius: 15px;
+      background: rgba(255,255,255,0.07);
+    }
+
+    /* Lineup */
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .controls select {
+      padding: 11px;
+
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+
+    .controls option {
+      color: black;
+    }
+
+    /* Football field */
+
+    .field {
+      position: relative;
+
+      width: 100%;
+      aspect-ratio: 0.72;
+
+      border-radius: 20px;
+
+      overflow: hidden;
+
+      background:
+        repeating-linear-gradient(
+          0deg,
+          #087443 0px,
+          #087443 55px,
+          #096c3e 55px,
+          #096c3e 110px
+        );
+
+      border: 2px solid rgba(255,255,255,0.35);
+    }
+
+    .field::before {
+      content: "";
+
+      position: absolute;
+
+      width: 55%;
+      height: 20%;
+
+      left: 22.5%;
+      top: 0;
+
+      border: 2px solid rgba(255,255,255,0.5);
+      border-top: none;
+    }
+
+    .field::after {
+      content: "";
+
+      position: absolute;
+
+      width: 55%;
+      height: 20%;
+
+      left: 22.5%;
+      bottom: 0;
+
+      border: 2px solid rgba(255,255,255,0.5);
+      border-bottom: none;
+    }
+
+    .player {
+      position: absolute;
+
+      transform: translate(-50%, -50%);
+
+      width: 48px;
+      height: 48px;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: white;
+      color: #111;
+
+      border: 3px solid #ffd700;
+
+      font-size: 11px;
+      font-weight: bold;
+
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .gk  { left: 50%; top: 91%; }
+    .lb  { left: 15%; top: 75%; }
+    .cb1 { left: 38%; top: 75%; }
+    .cb2 { left: 62%; top: 75%; }
+    .rb  { left: 85%; top: 75%; }
+
+    .cm1 { left: 30%; top: 53%; }
+    .cm2 { left: 50%; top: 48%; }
+    .cm3 { left: 70%; top: 53%; }
+
+    .lw  { left: 20%; top: 25%; }
+    .st  { left: 50%; top: 19%; }
+    .rw  { left: 80%; top: 25%; }
+
+    /* Packs */
+
+    .packs {
+      display: grid;
+      gap: 15px;
+    }
+
+    .pack {
+      padding: 25px;
+      text-align: center;
+
+      border-radius: 20px;
+
+      background: linear-gradient(
+        135deg,
+        rgba(255,215,0,0.35),
+        rgba(255,255,255,0.08)
+      );
+
+      border: 1px solid rgba(255,215,0,0.35);
+    }
+
+    .pack h3 {
+      margin-bottom: 8px;
+    }
+
+    .open-pack {
+      margin-top: 15px;
+
+      padding: 12px 20px;
+
+      border: none;
+      border-radius: 13px;
+
+      background: #ffd700;
+      color: #111;
+
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .pack-result {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    /* Mobile */
+
+    @media (max-width: 420px) {
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .menu-button {
+        min-height: 100px;
+        font-size: 14px;
+      }
+
+      .menu-icon {
+        font-size: 27px;
+      }
+
+      .player {
+        width: 42px;
+        height: 42px;
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <h1>⚽ Virtual Football League</h1>
+
+    <p>نسخه تست 0.1</p>
+
+    <select id="leagueSelect" class="league-select"
+            onchange="changeLeague()">
+
+      <option value="eng">🏴 Premier League</option>
+      <option value="spa">🇪🇸 La Liga</option>
+      <option value="ita">🇮🇹 Serie A</option>
+      <option value="ger">🇩🇪 Bundesliga</option>
+      <option value="fra">🇫🇷 Ligue 1</option>
+      <option value="ksa">🇸🇦 Saudi Pro League</option>
+      <option value="irn">🇮🇷 لیگ برتر ایران</option>
+
+    </select>
+
+  </div>
+
+
+  <!-- MAIN MENU -->
+
+  <div id="home" class="menu">
+
+    <button class="menu-button" onclick="openPage('lineup')">
+      <span class="menu-icon">⚽</span>
+      ترکیب
+    </button>
+
+    <button class="menu-button" onclick="openPage('table')">
+      <span class="menu-icon">🏆</span>
+      جدول
+    </button>
+
+    <button class="menu-button" onclick="openPage('golden')">
+      <span class="menu-icon">👟</span>
+      کفش طلا
+    </button>
+
+    <button class="menu-button" onclick="openPage('best')">
+      <span class="menu-icon">⭐</span>
+      بهترین بازیکنان
+    </button>
+
+    <button class="menu-button" onclick="openPage('results')">
+      <span class="menu-icon">📅</span>
+      نتایج هفته‌ها
+    </button>
+
+    <button class="menu-button" onclick="openPage('packs')">
+      <span class="menu-icon">🎁</span>
+      پک
+    </button>
+
+  </div>
+
+
+  <!-- LINEUP -->
+
+  <div id="lineup" class="page">
+
+    <button class="back" onclick="goHome()">← برگشت</button>
+
+    <h2>⚽ ترکیب</h2>
+
+    <div class="controls">
+
+      <select id="teamSelect">
+      </select>
+
+      <select id="formationSelect"
+              onchange="changeFormation()">
+
+        <option value="433">4-3-3</option>
+        <option value="442">4-4-2</option>
+        <option value="352">3-5-2</option>
+
+      </select>
+
+    </div>
+
+    <div class="field">
+
+      <div class="player gk">GK</div>
+
+      <div class="player lb">LB</div>
+      <div class="player cb1">CB</div>
+      <div class="player cb2">CB</div>
+      <div class="player rb">RB</div>
+
+      <div class="player cm1">CM</div>
+      <div class="player cm2">CM</div>
+      <div class="player cm3">CM</div>
+
+      <div class="player lw">LW</div>
+      <div class="player st">ST</div>
+      <div class="player rw">RW</div>
+
+    </div>
+
+    <p style="margin-top:15px;color:#aab8c5;font-size:12px;">
+      نسخه بعدی: با لمس بازیکن می‌توانیم بازیکن جدید انتخاب کنیم.
+    </p>
+
+  </div>
+
+
+  <!-- TABLE -->
+
+  <div id="table" class="page">
+
+    <button class="back" onclick="goHome()">← برگشت</button>
+
+    <h2>🏆 جدول</h2>
+
+    <div id="tableContent"></div>
+
+  </div>
+
+
+  <!-- GOLDEN BOOT -->
+
+  <div id="golden" class="page">
+
+    <button class="back" onclick="goHome()">← برگشت</button>
+
+    <h2>👟 کفش طلا</h2>
+
+    <div id="goldenContent"></div>
+
+  </div>
+
+
+  <!-- BEST PLAYERS -->
+
+  <div id="best" class="page">
+
+    <button class="back" onclick="goHome()">← برگشت</button>
+
+    <h2>⭐ بهترین بازیکنان</h2>
+
+    <div id="bestContent"></div>
+
+  </div>
+
+
+  <!-- RESULTS -->
+
+  <div id="results" class="page">
+
+    <button class="back" onclick="goHome()">← برگشت</button>
+
+    <h2>📅 نتایج هفته‌ها</h2>
+
+    <div class="week-buttons">
+
+      <button class="week-button"
+              onclick="showWeek(1)">
+        هفته ۱
+      </button>
+
+      <button class="week-button"
+              onclick="showWeek(2)">
+        هفته ۲
+      </button>
+
+      <button class="week-button"
+              onclick="showWeek(3)">
+        هفته ۳
+      </button>
+
+      <button class="week-button"
+              onclick="showWeek(4)">
+        هفته ۴
+      </button>
+
+    </div>
+
+    <div id="resultsContent"></div>
+
+  </div>
+
+
+  <!-- PACKS -->
+
+  <div id="packs" class="page">
+
+    <button class="back" onclick="goHome()">← برگشت</button>
+
+    <h2>🎁 پک‌ها</h2>
+
+    <div class="packs">
+
+      <div class="pack">
+
+        <h3>🥉 پک معمولی</h3>
+
+        <p>۳ بازیکن</p>
+
+        <button class="open-pack"
+                onclick="openPack('معمولی')">
+          باز کردن
+        </button>
+
+      </div>
+
+
+      <div class="pack">
+
+        <h3>🥇 پک طلایی</h3>
+
+        <p>۳ بازیکن با شانس بازیکن ویژه</p>
+
+        <button class="open-pack"
+                onclick="openPack('طلایی')">
+          باز کردن
+        </button>
+
+      </div>
+
+
+      <div class="pack">
+
+        <h3>💎 پک افسانه‌ای</h3>
+
+        <p>شانس بالای بازیکن قدرتمند</p>
+
+        <button class="open-pack"
+                onclick="openPack('افسانه‌ای')">
+          باز کردن
+        </button>
+
+      </div>
+
+    </div>
+
+    <div id="packResult"
+         class="pack-result">
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  /* =========================
+     DATA
+  ========================= */
+
+  const teams = {
+
+    eng: [
+      "Manchester City",
+      "Liverpool",
+      "Arsenal",
+      "Chelsea"
+    ],
+
+    spa: [
+      "Real Madrid",
+      "Barcelona",
+      "Atlético Madrid",
+      "Athletic Club"
+    ],
+
+    ita: [
+      "Inter",
+      "Milan",
+      "Juventus",
+      "Napoli"
+    ],
+
+    ger: [
+      "Bayern Munich",
+      "Dortmund",
+      "Leverkusen",
+      "RB Leipzig"
+    ],
+
+    fra: [
+      "PSG",
+      "Marseille",
+      "Monaco",
+      "Lyon"
+    ],
+
+    ksa: [
+      "Al Hilal",
+      "Al Nassr",
+      "Al Ittihad",
+      "Al Ahli"
+    ],
+
+    irn: [
+      "پرسپولیس",
+      "استقلال",
+      "سپاهان",
+      "تراکتور"
+    ]
+
+  };
+
+
+  const players = [
+
+    "محمد",
+    "علی",
+    "رضا",
+    "آرمان",
+    "سینا",
+    "امیر",
+    "مهدی",
+    "امید",
+    "نیما",
+    "یاسین"
+
+  ];
+
+
+  /* =========================
+     PAGE SYSTEM
+  ========================= */
+
+  function openPage(pageName) {
+
+    document.getElementById("home").style.display = "none";
+
+    document
+      .querySelectorAll(".page")
+      .forEach(page => {
+        page.classList.remove("active");
+      });
+
+    document
+      .getElementById(pageName)
+      .classList.add("active");
+
+  }
+
+
+  function goHome() {
+
+    document
+      .querySelectorAll(".page")
+      .forEach(page => {
+        page.classList.remove("active");
+      });
+
+    document.getElementById("home").style.display = "grid";
+
+  }
+
+
+  /* =========================
+     LEAGUE
+  ========================= */
+
+  function changeLeague() {
+
+    const league =
+      document.getElementById("leagueSelect").value;
+
+    const teamSelect =
+      document.getElementById("teamSelect");
+
+    teamSelect.innerHTML = "";
+
+    teams[league].forEach(team => {
+
+      const option =
+        document.createElement("option");
+
+      option.value = team;
+      option.textContent = team;
+
+      teamSelect.appendChild(option);
+
+    });
+
+    renderData();
+
+  }
+
+
+  /* =========================
+     TABLE
+  ========================= */
+
+  function renderData() {
+
+    const league =
+      document.getElementById("leagueSelect").value;
+
+    const selectedTeams =
+      teams[league];
+
+
+    let tableHTML = `
+
+      <table>
+
+        <tr>
+          <th>#</th>
+          <th>تیم</th>
+          <th>بازی</th>
+          <th>برد</th>
+          <th>امتیاز</th>
+        </tr>
+
+    `;
+
+
+    selectedTeams.forEach((team, index) => {
+
+      tableHTML += `
+
+        <tr>
+
+          <td>${index + 1}</td>
+
+          <td>${team}</td>
+
+          <td>${index + 3}</td>
+
+          <td>${3 - index}</td>
+
+          <td>${9 - index * 2}</td>
+
+        </tr>
+
+      `;
+
+    });
+
+
+    tableHTML += "</table>";
+
+    document.getElementById("tableContent").innerHTML =
+      tableHTML;
+
+
+    /* Golden Boot */
+
+    let goldenHTML = `
+
+      <table>
+
+        <tr>
+          <th>#</th>
+          <th>بازیکن</th>
+          <th>تیم</th>
+          <th>گل</th>
+        </tr>
+
+    `;
+
+
+    players.slice(0,5).forEach((player,index) => {
+
+      goldenHTML += `
+
+        <tr>
+
+          <td>${index + 1}</td>
+
+          <td>${player}</td>
+
+          <td>
+            ${selectedTeams[index % selectedTeams.length]}
+          </td>
+
+          <td>${12 - index * 2}</td>
+
+        </tr>
+
+      `;
+
+    });
+
+
+    goldenHTML += "</table>";
+
+    document.getElementById("goldenContent").innerHTML =
+      goldenHTML;
+
+
+    /* Best Players */
+
+    let bestHTML = `
+
+      <table>
+
+        <tr>
+          <th>#</th>
+          <th>بازیکن</th>
+          <th>تیم</th>
+          <th>نمره</th>
+        </tr>
+
+    `;
+
+
+    players.slice(0,5).forEach((player,index) => {
+
+      bestHTML += `
+
+        <tr>
+
+          <td>${index + 1}</td>
+
+          <td>${player}</td>
+
+          <td>
+            ${selectedTeams[index % selectedTeams.length]}
+          </td>
+
+          <td>${(9.8 - index * 0.3).toFixed(1)}</td>
+
+        </tr>
+
+      `;
+
+    });
+
+
+    bestHTML += "</table>";
+
+    document.getElementById("bestContent").innerHTML =
+      bestHTML;
+
+  }
+
+
+  /* =========================
+     RESULTS
+  ========================= */
+
+  function showWeek(week) {
+
+    const league =
+      document.getElementById("leagueSelect").value;
+
+    const selectedTeams =
+      teams[league];
+
+
+    document.getElementById("resultsContent").innerHTML = `
+
+      <div class="match">
+
+        📅 هفته ${week}
+
+        <br><br>
+
+        ${selectedTeams[0]}
+
+        <strong> ${week + 1} - 1 </strong>
+
+        ${selectedTeams[1]}
+
+      </div>
+
+
+      <div class="match">
+
+        ${selectedTeams[2]}
+
+        <strong> 2 - 0 </strong>
+
+        ${selectedTeams[3]}
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================
+     FORMATION
+  ========================= */
+
+  function changeFormation() {
+
+    const formation =
+      document.getElementById("formationSelect").value;
+
+    alert(
+      "سیستم انتخاب شد: " + formation.replace("", "-")
+    );
+
+  }
+
+
+  /* =========================
+     PACK
+  ========================= */
+
+  function openPack(type) {
+
+    const shuffled =
+      [...players].sort(() => Math.random() - 0.5);
+
+    const selected =
+      shuffled.slice(0,3);
+
+
+    document.getElementById("packResult").innerHTML = `
+
+      <div style="
+        margin-top:15px;
+        padding:15px;
+        border-radius:15px;
+        background:rgba(255,255,255,0.08);
+      ">
+
+        🎉 پک ${type} باز شد!
+
+        <br><br>
+
+        ⭐ ${selected[0]}
+
+        <br>
+
+        ⭐ ${selected[1]}
+
+        <br>
+
+        ⭐ ${selected[2]}
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================
+     START
+  ========================= */
+
+  changeLeague();
+
+</script>
+
+</body>
+  </html>
